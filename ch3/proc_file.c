@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+/* parent and child processes share the same pointer */
+
 failure(char *s)
 {
   perror(s);
