@@ -16,7 +16,7 @@ int doccomand(char* command)
     wait(NULL);
     
   }
-  return 0;
+   return 0;
       
 }
 
