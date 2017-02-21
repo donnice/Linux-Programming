@@ -1,6 +1,7 @@
 #include <strings.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static int num=0;
 static char namebuf[20];
@@ -40,4 +41,13 @@ itoa(int i, char* string)
     i%=power;
   }
   *string='\0';
+}
+
+int main() {
+  int newpgid;
+
+  newpgid=setpgrp();
+  printf("%d",newpgid);
+
+  return 0;
 }
