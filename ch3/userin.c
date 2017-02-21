@@ -85,4 +85,49 @@ procline()
     case EOL:
     case SEMICOLON:
     case AMPERSAND:
+      type=(toktype==AMPERSAND)?BACKGROUND:FOREGROUND;
+      if(narg!=0){
+	arg[narg]=NULL;
+	runcommand(arg,type);
+      }
+      if(toktype==EOL)
+	return;
+      narg=0;
+      break;
+    }
+  }
+}
+
+runcommand(char** cline, int where)
+{
+  int pid,exitstat,ret;
+
+  if((pid=fork())<0){
+    perror("fork fail");
+    return(-1);
+  }
+  if(!pid){/* child process */
+    execvp(*cline,cline);
+    perror(*cline);
+    exit(127);
+  }
+  /* parent */
+  /* background */
+  if(where==BACKGROUND){
+    printf("[process id %d]\n",pid);
+    return(0);
+  }
+
+  /* front desk */
+  while((ret=wait(&exitstat))!=pid&&ret!=-1);
+  return(ret==-1?-1:exitstat);
+}
+
+char *prompt="command>";
+
+int main()
+{
+  while(userin(prompt)!=EOF)
+    procline();
+}
    
