@@ -3,6 +3,9 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/fcntl.h>
+
 
 #define SEQFILE "./sequo"
 #define MAXBUF 100
@@ -54,12 +57,24 @@ int main()
 
 my_lock(int fd)
 {
-  return;
+  /* move point back to file head */
+  lseek(fd,0L,0);
+  /* lock the file */
+  if(lockf(fd,F_LOCK,0L)==-1)
+    {
+      perror("can't F_LOCK");
+      exit(1);
+    }
 }
 
 my_unlock(int fd)
 {
-  return;
+  lseek(fd,0L,0);
+  if(lockf(fd,F_ULOCK,0L)==-1)
+    {
+      perror("can't F_UNLOCK");
+      exit(1);
+    }
 }
       
 
