@@ -76,6 +76,24 @@ my_unlock(int fd)
       exit(1);
     }
 }
+
+my_flock(int fd)
+{
+  if(flock(fd,LOCK_EX)==-1) // exclude
+    {
+      perror("can't LOCK_EX");
+      exit(1);
+    }
+}
+
+my_unload(int fd)
+{
+  if(flock(fd,LOCK_UN)==-1)
+    {
+      perror("can't LOCK_UN");
+      exit(1);
+    }
+}
       
 
 	  
