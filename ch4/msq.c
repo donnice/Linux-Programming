@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
+#include <sys/msg.h>
+#include <stdio.h>
+
 
 struct mymsgbuf {
     long mtype;        /* Message type */
@@ -34,6 +37,75 @@ int send_message(int qid,struct mymsgbuf* qbuf)
   return result;
 }
 
+int read_message(int qid,long type,struct mymsgbuf* qbuf)
+{
+  int result,length;
+
+  length=sizeof(struct mymsgbuf)-sizeof(long);
+
+  if((result=msgrcv(qid,qbuf,length,type,0))==-1)
+    {
+      return -1;
+    }
+
+  return result;
+}
+
+/* check whether eligible message in queue */
+/*int peek_message(int qid, long type)
+ *{
+ * int result,length;
+ * if((result=msgrcv(qid,NULL,0,type,IPC_NOWAIT))==-1)
+ *  {
+ *    if(errno==E2BIG)
+ *	return TRUE;
+ *  }
+ *
+ *return FALSE;
+} */
+
+/* IPC_STAT */
+int get_queue_ds(int qid,struct msgqid_ds *qbuf)
+{
+  if(msgctl(qid,IPC_STAT,qbuf)==-1)
+    {
+      return -1;
+    }
+
+  return 0;
+}
+
+/* IPC_SET */
+int change_queue_mode(int qid,char *mode)
+{
+  struct msqid_ds tmpbuf;
+
+  /* retrieve a current copy of the internal ds */
+  get_queue_ds(qid,&tmpbuf);
+  
+  /* change permission */
+  sscanf(mode,"%ho",&tmpbuf.msg_perm.mode);
+
+  /* Update the internal ds */
+  if(msgctl(qid,IPC_SET,&tmpbuf)==-1)
+    {
+      return -1;
+    }
+
+  return 0;
+}
+
+int remove_queue(int qid)
+{
+  if(msgctl(qid,IPC_RMID,0)==-1)
+    {
+      return -1;
+    }
+
+  return 0;
+}
+
+  
 int main()
 {
   int qid;
