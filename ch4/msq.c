@@ -2,6 +2,12 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 
+struct mymsgbuf {
+    long mtype;        /* Message type */
+    int request;       /* work request number */
+    double salary;
+};
+
 /* msgget() */
 int open_queue(key_t keyval)
 {
@@ -32,11 +38,7 @@ int main()
 {
   int qid;
   key_t msgkey;
-  struct mymsgbuf {
-    long mtype;        /* Message type */
-    int request;       /* work request number */
-    double salary;
-  } msg;
+  struct mymsgbuf msg;
 
   /* Generate our IPC key value */
   msgkey=ftok(".",'m');    /* convert pathname to Sys V */
@@ -57,5 +59,4 @@ int main()
     exit(1);
   }
 }
-    
     
