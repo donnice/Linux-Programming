@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+#define MAX_SEND_SIZE 80
+
+struct mymsgbuf {
+  long mtype;
+  char mtext[MAX_SEND_SIZE];
+};
+
+void send_message(int qid, struct mymsgbuf* qbuf,long type, char *text);
+void read_message(int qid, struct mymsgbuf* qbuf,long type);
+void remove_queue(int qid);
+void change_queue_mode(int qid,char *mode);
+void usage(void);
+
+int main(int argc, char *argv[])
+{
+  key_t key;
+  int msgqueue_id;
+  struct mymsgbuf qbuf;
+
+  if(argc == 1)
+    usage();
+
+  /* Create unique key via call to ftok() */
+  key = ftok(".",'m');
+
+  /* Open the queue - create if necessary */
+  
