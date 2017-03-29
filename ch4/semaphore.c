@@ -32,3 +32,22 @@ void init_semaphore(int sid, int semnum, int initval)
   semopts.val=initval;
   semctl(sid, semnum, SETVAL,semopts);
 }
+
+void getmode(int sid)
+{
+  int rc;
+  union semun semopts;
+
+  struct semid_ds mysemds;
+  /* allocate mem to buf */
+  semopts.buf=&mysemds;
+
+  if((rc=semctl(sid,0,IPC_STAT,semopts))==-1)
+    {
+      perror("semctl");
+      exit(1);
+    }
+
+  printf("Permission Mode were %o\n",semopts.buf->sem_perm.mode);
+  return;
+}
