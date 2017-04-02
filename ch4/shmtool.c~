@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#define SEGSIZE 100
+
+int main(int argc, char* argv[])
+{
+  key_t key;
+  int shmid,cntr;
+  char *segptr;
+
+  if(argc==1)
+    usage();
+
+  /* Create Unique key via call to ftok() */
+  key=ftok(".",'S');
+
+  /* Open the sm segment-create if not exist */
+  if((shmid=shmget(key,SEGSIZE,IPC_CREAT|IPC_EXCL|0666))==-1)
+    {
+      printf("Shared memory segment exists - opening as client\n");
+
+      if((shmid=shmget(key,SEGSIZE,0))==-1)
+	{
+	  perror("sh,get");
+	  exit(1);
+	}
+    }
+
+  else
+    {
+      printf("Creating new shared memory segment\n");
+    }
+
+  
