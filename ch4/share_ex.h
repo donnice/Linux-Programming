@@ -11,7 +11,6 @@
 /* semaphore key */
 #define SEMKEY (key_t)0x20
 
-#define BUFSIZ 512
 /* buffer size */
 #define SIZ 5*BUFSIZ
 

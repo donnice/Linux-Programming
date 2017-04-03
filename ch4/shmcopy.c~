@@ -1,0 +1,51 @@
+#include "share_ex.h"
+
+#define IFLAGS (IPC_CREAT|IPC_EXCL)
+#define ERR ((struct databuf*)-1)
+
+static int shmid1, shmid2, semid;
+
+fatal(char *mes)
+{
+  perror(mes);
+  exit(1);
+}
+
+getseg(struct databuf** p1, struct databuf** p2)
+{
+  /* build shared memory */
+  if((shmid=shmget(SHMKEY1,sizeof(struct databuf),0600|IFLAGS))<0)
+    fatal("shmget");
+
+  /* Build connect between shared memory */
+  if((*p1=(struct databuf*)(shmat(shmid1,0,0)))==ERR)
+    fatal("shmat");
+
+  if((*p2=(struct databuf*)(shmat(shmid1,0,0)))==ERR)
+    fatal("shmat");
+
+}
+
+int getsem()
+{
+  /* Build signal object */
+  if((semid=semget(SEMKEY,2,0600|IFLAGS))<0)
+    fatal("semget");
+
+  /* Initialize signal */
+  if(semctl(semid,0,SETVAL,0)<0)
+    fatal("semctl");
+
+  if(semctl(semid,1,SETVAL,0)<0)
+    fatal("semctl");
+
+  return semid;
+}
+
+remove()
+{
+  if(shmctl(shmid1,IPC_RMID,NULL)<0)
+    fatal("shmctl");
+
+  if
+
