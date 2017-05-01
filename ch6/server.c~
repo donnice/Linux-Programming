@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+
+#define MYPORT 4000
+
+#define BACKLOG 10
+
+main()
+{
+  /* listen at sock_fd, new_fd get new connect */
+  int sock_fd,new_fd;
+  /* own address */
+  struct sockaddr_in my_addr;
+
+  
