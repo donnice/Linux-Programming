@@ -4,60 +4,58 @@
 #include <string.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 
+/* port to connect */
 #define MYPORT 5000
 
-#define MAXBUFLEN 100
-
-main()
+int main(int argc, char* argv[])
 {
-  int sockfd;
+	int sockfd;
+	/* connector info */	
+	struct sockaddr_in their_addr;
+	struct hostent *he;
+	int numbytes;
 
-  /* local info */
-  struct sockaddr_in my_addr;
+	if(argc != 3)
+	{
+		fprintf(stderr,"usage:talker hostname message\n");
+		exit(1);
+	}
 
-  /* connector */
-  struct sockaddr_in their_addr;
-  int addr_len,numbytes;
-  char buf[MAXBUFLEN];
-  
-  if((sockfd=socket(AF_INET,SOCK_DGRAM,0))==-1){
-    perror("socket");
-    exit(1);
-  }
-  /* host endian */
-  my_addr.sin_family=AF_INET;
+	if((he=gethostbyname(argv[1]))==NULL)
+	{
+		herror("gethostbyname");
+		exit(1);
+	}
 
-  /* internet endian */
-  my_addr.sin_port=htons(MYPORT);
+	if((sockfd=socket(AF_INET,SOCK_DGRAM,0))==-1)
+	{
+		perror("socket");
+		exit(1);
+	}
 
-  /* set own IP:machine IP */
-  my_addr.sin_addr.s_addr=INADDR_ANY;
+	/* host endiness */
+	their_addr.sin_family=AF_INET;
 
-  /* bzero */
-  bzero(&(my_addr.sin_zero),8);
-  
-  /* bind port */
-  if(bind(sockfd,(struct sockaddr*)&my_addr,sizeof(struct sockaddr))==-1){
-    perror("bind");
-    exit(1);
-  }
+	/* Internet endi */
+	their_addr.sin_port=htons(MYPORT);
+	their_addr.sin_addr=*((struct in_addr *)he->h_addr);
+	/* bzero the unused part */
+	bzero(&(their_addr.sin_zero),8);
+	if((numbytes=sendto(sockfd,argv[2],strlen(argv[2]),0,
+		(struct sockaddr*)&their_addr,sizeof(struct sockaddr)))==-1)
+	{
+		perror("recvfrom");
+		exit(1);
+	}
 
-  addr_len=sizeof(struct sockaddr);
-
-  if((numbytes=recvfrom(sockfd,buf,MAXBUFLEN,0,
-			(struct sockaddr*)&their_addr,&addr_len))==-1){
-    perror("recvfrom");
-    exit(1);
-  }
-
-  printf("got packet from %s\n",inet_ntoa(their_addr.sin_addr));
-  printf("packet is %d bytes long\n",numbytes);
-  buf[numbytes]='\0';
-  printf("packet contains %s\n",buf);
-
-  close(sockfd);
-  
+	printf("sent &d bytes to %s\n",numbytes,inet_ntoa(their_addr.sin_addr));
+	close(sockfd);
+	return 0;
 }
+
+
+
