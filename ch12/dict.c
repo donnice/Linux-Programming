@@ -7,7 +7,7 @@
 
 #define DICTSIZ 100
 
-char dict[DICTSIZ][MAXWORD+1]
+char dict[DICTSIZ][MAXWORD+1];
 
 int nwords=0;
 int nextin(char* cmd,char* word);
@@ -67,7 +67,69 @@ int main(int argc, char* argv[])
 	}
 }
 
+/*
+ * Read input cmd and parameter
+ */
+
 int nextin(char* cmd, char* word)
 {
 	int i, ch;
+	
+	ch=getc(stdin);
+	while(isspace(ch))
+	{
+		ch=getc(stdin);
+	}
+	if(ch==EOF)
+	{
+		return -1;
+	}
+	if('\n'==ch)
+	{
+		return 0;
+	}
 
+	i=0;
+
+	while(!isspace(ch))
+	{
+		if(MAXWORD < ++i)
+		{
+			printf("error:word too long\n");
+			exit(1);
+		}
+		*word++=ch;
+		ch=getc(stdin);
+	}
+	*word++=0;
+	return i;
+}
+
+/*
+ * Initialize dict
+ */
+int initw()
+{
+	nwords=0;
+	return 1;
+}
+
+int insertw(const char* word)
+{
+	strcpy(dict[nwords],word);
+	nwords++;
+	return nwords;
+}
+
+int lookupw(const char* word)
+{
+	int I;
+	for(I=0; nwords > I; I++)
+	{
+		if(0 == strcmp(word,dict[I]))
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
