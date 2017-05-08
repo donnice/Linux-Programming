@@ -3,6 +3,8 @@
 
 #include "rdict.h"
 
+/* include initw, insertw,deletew, lookupw */
+
 extern CLIENT *handle;
 /* temp store return data */
 static int *ret;
